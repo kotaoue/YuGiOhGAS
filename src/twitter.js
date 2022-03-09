@@ -13,21 +13,29 @@ function fetchYuGiOh_INS_INFO(max_id = 0) {
     if (max_id != 0) {
       q = q + "&max_id=" + max_id;
     }
-    const json = ts.fetch("https://api.twitter.com/1.1/statuses/user_timeline.json" + q, method);
 
-    const tweets = JSON.parse(json);
-    for (i in tweets) {
-      const tweet = tweets[i];
-      if (tweet.id_str) {
-        console.log(tweet.id + "-" + tweet.id_str);
-        max_id = tweet.id;
-        if (tweet.full_text.includes("#ビギナーズデッキ")) {
-          const r = parseBeginnerDeck(tweet.full_text, tweet.id_str);
-          console.log(r);
-          setBeginnerDeckValue(r);
+    const url = "https://api.twitter.com/1.1/statuses/user_timeline.json" + q;
+    try {
+      const json = ts.fetch(url, method);
+
+      const tweets = JSON.parse(json);
+      for (i in tweets) {
+        const tweet = tweets[i];
+        if (tweet.id_str) {
+          console.log(tweet.id + "-" + tweet.id_str);
+          max_id = tweet.id;
+          if (tweet.full_text.includes("#ビギナーズデッキ")) {
+            const r = parseBeginnerDeck(tweet.full_text, tweet.id_str);
+            console.log(r);
+            setBeginnerDeckValue(r);
+          }
         }
       }
     }
+    catch {
+      console.error("fetch failure from " + url);
+    }
+
 
     if (tweets.length != 0) {
       fetchYuGiOh_INS_INFO(max_id)
